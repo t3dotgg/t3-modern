@@ -2,7 +2,10 @@
 const nextConfig = {
   experimental: {
     appDir: true,
-  },
-}
 
-module.exports = nextConfig
+    // Because I can
+    runtime: "experimental-edge",
+  },
+};
+
+module.exports = nextConfig;
