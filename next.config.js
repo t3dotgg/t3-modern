@@ -4,7 +4,7 @@ const nextConfig = {
     appDir: true,
 
     // Because I can
-    runtime: "experimental-edge",
+    // runtime: "experimental-edge",
   },
 };
 

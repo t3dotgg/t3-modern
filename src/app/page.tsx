@@ -1,11 +1,18 @@
 import { Inter } from "next/font/google";
 import { UserButton, currentUser } from "@clerk/nextjs/app-beta";
 import Link from "next/link";
+import { db } from "~/db";
+import { people } from "~/db/schema";
+import { Button } from "./button";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default async function Home() {
   const user = await currentUser();
+
+  const peopleFromDb = await db.select().from(people);
+
+  console.log("people", peopleFromDb);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -21,6 +28,13 @@ export default async function Home() {
           <UserButton />
         </div>
       )}
+      <div className="flex flex-col">
+        {peopleFromDb.map((person) => {
+          return <div key={person.id}>{`${person.id} - ${person.name}`}</div>;
+        })}
+      </div>
+
+      <Button />
     </main>
   );
 }

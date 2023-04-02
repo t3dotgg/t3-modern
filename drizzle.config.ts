@@ -5,5 +5,5 @@ d.config({ path: `.env.local`, override: true });
 
 export default {
   schema: "./src/db/schema.ts",
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DB_URL,
 } satisfies Config;
