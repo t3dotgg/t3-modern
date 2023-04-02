@@ -16,7 +16,7 @@ export default async function Home() {
       )}
 
       {user && (
-        <div className="text-xl font-bold flex items-center gap-2">
+        <div className="flex items-center gap-2 text-xl font-bold">
           <div>Hello {user.firstName}</div>
           <UserButton />
         </div>
