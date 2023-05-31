@@ -1,21 +1,11 @@
 import { drizzle } from "drizzle-orm/planetscale-serverless";
-import { Client } from "@planetscale/database";
+import { connect } from "@planetscale/database";
 
-const {
-  DATABASE_HOST: host,
-  DATABASE_USERNAME: username,
-  DATABASE_PASSWORD: password,
-} = process.env;
+import * as schema from "./schema";
 
-if (!host || !username || !password) {
-  throw new Error("Some of env variables are missing");
-}
-const client = new Client({
-  fetch,
-  host,
-  username,
-  password,
+// create the connection
+const connection = connect({
+  url: process.env["DATABASE_URL"],
 });
 
-const connection = client.connection();
-export const db = drizzle(connection);
+export const db = drizzle(connection, { schema });

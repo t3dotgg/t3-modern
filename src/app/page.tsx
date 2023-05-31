@@ -1,40 +1,63 @@
-import { Inter } from "next/font/google";
-import { UserButton, currentUser } from "@clerk/nextjs/app-beta";
-import Link from "next/link";
-import { db } from "~/db";
-import { people } from "~/db/schema";
-import { Button } from "./button";
+import { db } from "@/db";
+import { randomNumber } from "@/db/schema";
+import { SignInButton, SignedIn, SignedOut, UserProfile } from "@clerk/nextjs";
+import { revalidatePath } from "next/cache";
 
-const inter = Inter({ subsets: ["latin"] });
+async function RandomNumbers() {
+  const data = await db.query.randomNumber.findMany();
 
-export default async function Home() {
-  const user = await currentUser();
-
-  const peopleFromDb = await db.select().from(people);
-
-  console.log("people", peopleFromDb);
+  if (data.length === 0)
+    return (
+      <div className="text-2xl">
+        Click the button above to generate some numbers
+      </div>
+    );
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {!user && (
-        <div className="text-xl font-bold">
-          <Link href="/sign-in">Sign In</Link>
-        </div>
-      )}
-
-      {user && (
-        <div className="flex items-center gap-2 text-xl font-bold">
-          <div>Hello {user.firstName}</div>
-          <UserButton />
-        </div>
-      )}
-      <div className="flex flex-col">
-        {peopleFromDb.map((person) => {
-          return <div key={person.id}>{`${person.id} - ${person.name}`}</div>;
-        })}
+    <div className="flex max-w-sm flex-col gap-2 text-center">
+      <div className="pb-4 text-2xl">
+        Here are some random numbers stored in your DB:
       </div>
+      {data.map((rn) => (
+        <span key={rn.id}>{rn.number}</span>
+      ))}
+    </div>
+  );
+}
 
-      <Button />
-    </main>
+async function addRandomNumber() {
+  "use server";
+  const update = await db
+    .insert(randomNumber)
+    .values({ number: Math.floor(Math.random() * 100000).toString() });
+
+  revalidatePath("/");
+  return update;
+}
+
+function CreateNewNumberForm() {
+  return (
+    <form action={addRandomNumber} className="flex flex-col items-center">
+      <button
+        type="submit"
+        className="rounded border-2 bg-green-700 p-2 px-4 hover:bg-green-600"
+      >
+        Create New Number
+      </button>
+    </form>
+  );
+}
+
+export default async function Home() {
+  return (
+    <div className="flex flex-col items-center gap-8 p-8">
+      <SignedOut>
+        <SignInButton />
+      </SignedOut>
+      <SignedIn>
+        <CreateNewNumberForm />
+        <RandomNumbers />
+      </SignedIn>
+    </div>
   );
 }

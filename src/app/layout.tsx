@@ -1,10 +1,14 @@
+// app/layout.tsx
 import "./globals.css";
+import { Inter } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
+import TopNavLayout from "./_components/topnav";
 
-import { ClerkProvider } from "@clerk/nextjs/app-beta";
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Create T3 Modern",
-  description: "Theo got bored again",
+  title: "T3 Future",
+  description: "Project started by t3-future",
 };
 
 export default function RootLayout({
@@ -13,10 +17,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <ClerkProvider>
-        <body>{children}</body>
-      </ClerkProvider>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={inter.className}>
+          <TopNavLayout>{children}</TopNavLayout>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
