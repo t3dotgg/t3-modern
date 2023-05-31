@@ -1,10 +1,13 @@
 import { db } from "@/db";
 import { randomNumber } from "@/db/schema";
 import { SignInButton, SignedIn, SignedOut, UserProfile } from "@clerk/nextjs";
+import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 async function RandomNumbers() {
-  const data = await db.query.randomNumber.findMany();
+  const data = await db.query.randomNumber.findMany({
+    orderBy: desc(randomNumber.id),
+  });
 
   if (data.length === 0)
     return (
@@ -18,8 +21,27 @@ async function RandomNumbers() {
       <div className="pb-4 text-2xl">
         Here are some random numbers stored in your DB:
       </div>
+
       {data.map((rn) => (
-        <span key={rn.id}>{rn.number}</span>
+        <div key={rn.id} className="flex justify-between">
+          <span>{rn.number}</span>
+
+          <form
+            action={async () => {
+              "use server";
+              await db.delete(randomNumber).where(eq(randomNumber.id, rn.id));
+              revalidatePath("/");
+            }}
+            className="flex flex-col items-center"
+          >
+            <button
+              type="submit"
+              className="rounded bg-red-200 p-2 font-extrabold text-black"
+            >
+              X
+            </button>
+          </form>
+        </div>
       ))}
     </div>
   );
